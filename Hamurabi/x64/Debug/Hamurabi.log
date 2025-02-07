@@ -1,0 +1,3 @@
+﻿  Hamurabi.cpp
+H:\hammurabi game\Hamurabi\Hamurabi\Hamurabi.cpp(19,19): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Hamurabi.vcxproj -> H:\hammurabi game\Hamurabi\x64\Debug\Hamurabi.exe
