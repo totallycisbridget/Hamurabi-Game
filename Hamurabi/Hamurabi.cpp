@@ -109,6 +109,10 @@ public:
     bool gameYear(){
         int userFoodInp, userPlantingInp, userLandPurchInp; //variables for user inputs
 
+        //some constants
+        const int foodPerPerson = 20; //each person will always require 20 bushels
+        const int plantingCost = 2; //each acre can only be planted with 2 bushels
+
         //general variables ill need
         int populationFed, populationStarved = 0;
         int extraFoodCount, immigrationCount = 0;
@@ -140,7 +144,7 @@ public:
                     << std::endl;; //actually tell the user what happened
                 std::cin.clear();//clears the inputso it can be redone by the user
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cin >> userFoodInp;
+                continue;//get the user input again
             }
 
 
@@ -153,7 +157,7 @@ public:
                     << std::endl;; //actually tell the user what happened
                 std::cin.clear();//clears the inputso it can be redone by the user
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cin >> userPlantingInp;
+                continue;
             }
 
             std::cout << "One acre of land costs "
@@ -166,7 +170,7 @@ public:
                     << std::endl;; //actually tell the user what happened
                 std::cin.clear();//clears the inputso it can be redone by the user
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cin >> userLandPurchInp;
+                continue;
             }
 
 
@@ -189,7 +193,7 @@ public:
 
 
         //feeding the population
-        populationFed = userFoodInp / 20; //get the number of people fed
+        populationFed = userFoodInp / foodPerPerson; //get the number of people fed
         if (populationFed < game.popCount) //if there are less people fed than the total population, the amount of deaths will be calculated
         {
             populationStarved = game.popCount - populationFed;
@@ -202,8 +206,8 @@ public:
         }
         else if (populationFed > game.popCount) //if there is more food given than needed, the number of immigrants will be workd out
         {
-            extraFoodCount = userFoodInp - (game.popCount * 20);
-            immigrationCount = extraFoodCount / 20;
+            extraFoodCount = userFoodInp - (game.popCount * foodPerPerson);
+            immigrationCount = extraFoodCount / foodPerPerson;
             game.popCount += immigrationCount;
             std::cout << immigrationCount
                 << " immigrants have joined our beloved city"
@@ -218,11 +222,11 @@ public:
             totalFertileAcres += 5 + (rand() % 6); //random number from 5 - 10
         }
 
-        acresPlanted = userPlantingInp / 2; //each acre requires 2 bushels to be planted
+        acresPlanted = userPlantingInp / plantingCost; //each acre requires 2 bushels to be planted
         if (acresPlanted > game.acresCount) acresPlanted = game.acresCount; //ensure that user cannot plant more than owned
          
 
-        game.bushelsCount -= (acresPlanted * 2);
+        game.bushelsCount -= (acresPlanted * plantingCost);
 
         harvestPerAcre = 2 + (rand() % 5); //random number from 2 - 6
         totalHarvest = acresPlanted * harvestPerAcre;
@@ -281,6 +285,15 @@ public:
             std::cout << "3.How To Play\n";
             std::cout << "4.Exit\n";
             std::cin >> menuUserChoice;
+            if (std::cin.fail()) //input validation
+            {
+                std::cout << "Enter a whole number according to the menu choice"
+                    << std::endl;; //actually tell the user what happened
+                std::cin.clear();//clears the inputso it can be redone by the user
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                continue;//get the user input again
+            }
+
 
             
             switch (menuUserChoice)
@@ -308,7 +321,7 @@ public:
     }
 
 
-        void htpInstructions()
+        void htpInstructions() //instructions on how the game works
         {
             std::cout << "As our beloved Dear Leader, you are tasked with allocating bushels of grain to our people! \nYou have been given a 10 year term to prove yourself."
                 << "\nHowever, you must be be careful as you only have so many bushels of grain to feed our people with."
