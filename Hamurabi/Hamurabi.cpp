@@ -91,7 +91,7 @@ private:
 
 
 public:
-    void start(bool load = false) {
+    void start(bool load) {
         if (load) {
             if (!game.loadGame("Game_Save_Data.txt")) {
                 std::cout << "Starting a new game instead.\n";
@@ -134,14 +134,40 @@ public:
         {
             std::cout << "How many bushels do you want to feed the people? ";
             std::cin >> userFoodInp;
+            if (std::cin.fail()) //input validation
+            {
+                std::cout << "Enter a whole number"
+                    << std::endl;; //actually tell the user what happened
+                std::cin.clear();//clears the inputso it can be redone by the user
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cin >> userFoodInp;
+            }
+
+
             //get the users spending 
             std::cout << "How many acres do you want to plant? ";
             std::cin >> userPlantingInp;
+            if (std::cin.fail()) //input validation
+            {
+                std::cout << "Enter a whole number"
+                    << std::endl;; //actually tell the user what happened
+                std::cin.clear();//clears the inputso it can be redone by the user
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cin >> userPlantingInp;
+            }
 
             std::cout << "One acre of land costs "
                 << randLandPrice 
                 << "\nHow many acres of land do you want to purchase ? ";
             std::cin >> userLandPurchInp;
+            if (std::cin.fail()) //input validation
+            {
+                std::cout << "Enter a whole number"
+                    << std::endl;; //actually tell the user what happened
+                std::cin.clear();//clears the inputso it can be redone by the user
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cin >> userLandPurchInp;
+            }
 
 
 
@@ -245,8 +271,9 @@ public:
     void mainMenu()
     {
         int menuUserChoice;
+        mainGame game;
 
-        do
+        do//a dowhile loop so it repeat if needed
         {
             std::cout << "______------Hamurabi------______\n";
             std::cout << "1.Start New Game\n";
@@ -255,7 +282,7 @@ public:
             std::cout << "4.Exit\n";
             std::cin >> menuUserChoice;
 
-            mainGame game;
+            
             switch (menuUserChoice)
             {
             case 1:
