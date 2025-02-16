@@ -24,9 +24,9 @@ struct gameState
         std::ofstream file(Game_Save_Data);//opens a file
         if (file.is_open())
         {
-            file << acresCount << "    "
-                << popCount << "    "
-                << bushelsCount << "    "
+            file << acresCount << "\t"
+                << popCount << "\t"
+                << bushelsCount << "\t"
                 << year; //if it opens these variables will be added
             file.close(); //close the file
             std::cout << "save successful" << std::endl;
@@ -80,6 +80,31 @@ struct gameState
 
 
     }
+
+
+    bool checkInput(int varCheck)
+    {
+        if (std::cin.fail()) //input validation
+        {
+            std::cout << "Try Again."
+                << std::endl;; //actually tell the user what happened
+            std::cin.clear();//clears the inputso it can be redone by the user
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');//clears the buffer
+            return true;//ensure the users has to redo their input
+        }
+
+        if (varCheck < 0) //while this is not very efficient and i could probably put these into a function, i cant be bothered. ill do it later
+        {
+            std::cout << "Try Again."
+                << std::endl;; //actually tell the user what happened
+            std::cin.clear();//clears the inputso it can be redone by the user
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return true;
+        }
+        
+        return false;//returns false if inputs are valid
+        
+    }
 };
 
 
@@ -91,10 +116,11 @@ private:
 
 
 public:
+
     void start(bool load) {
         if (load) {
-            if (!game.loadGame("Game_Save_Data.txt")) {
-                std::cout << "Starting a new game instead.\n";
+            if (!game.loadGame("Hamurabi.txt")) {
+                std::cout << "Starting a new game instead.\n"; 
             }
         }
 
@@ -138,40 +164,21 @@ public:
         {
             std::cout << "How many bushels do you want to feed the people? ";
             std::cin >> userFoodInp;
-            if (std::cin.fail()) //input validation
-            {
-                std::cout << "Enter a whole number"
-                    << std::endl;; //actually tell the user what happened
-                std::cin.clear();//clears the inputso it can be redone by the user
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                continue;//get the user input again
-            }
+            if (game.checkInput(userFoodInp)) continue;
 
 
             //get the users spending 
             std::cout << "How many acres do you want to plant? ";
             std::cin >> userPlantingInp;
-            if (std::cin.fail()) //input validation
-            {
-                std::cout << "Enter a whole number"
-                    << std::endl;; //actually tell the user what happened
-                std::cin.clear();//clears the inputso it can be redone by the user
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                continue;
-            }
+            //game.checkInput(userPlantingInp);
+            if (game.checkInput(userPlantingInp)) continue;
+            
 
             std::cout << "One acre of land costs "
                 << randLandPrice 
-                << "\nHow many acres of land do you want to purchase ? ";
+                << "\nHow many acres of land do you want to purchase? ";
             std::cin >> userLandPurchInp;
-            if (std::cin.fail()) //input validation
-            {
-                std::cout << "Enter a whole number"
-                    << std::endl;; //actually tell the user what happened
-                std::cin.clear();//clears the inputso it can be redone by the user
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                continue;
-            }
+            if (game.checkInput(userLandPurchInp)) continue;
 
 
 
@@ -222,11 +229,12 @@ public:
             totalFertileAcres += 5 + (rand() % 6); //random number from 5 - 10
         }
 
-        acresPlanted = userPlantingInp / plantingCost; //each acre requires 2 bushels to be planted
-        if (acresPlanted > game.acresCount) acresPlanted = game.acresCount; //ensure that user cannot plant more than owned
+        //acresPlanted = userPlantingInp * plantingCost; //each acre requires 2 bushels to be planted
+        if ((acresPlanted = userPlantingInp * plantingCost) > game.acresCount) acresPlanted = game.acresCount; //ensure that user cannot plant more than owned
          
 
         game.bushelsCount -= (acresPlanted * plantingCost);
+        
 
         harvestPerAcre = 2 + (rand() % 5); //random number from 2 - 6
         totalHarvest = acresPlanted * harvestPerAcre;
@@ -249,15 +257,16 @@ public:
         //give the user the option to save
         std::cout << "\nWould you like to save? (y/n/q yes, no or quit): ";
         std::cin >> userSaveInput;
+        
 
         if (userSaveInput == 'y' || userSaveInput == 'Y')
         {
-            game.saveGame("Game_Save_Data.txt");
+            game.saveGame("Hamurabi.txt");
             return true;
         }
         else if (userSaveInput == 'q' || userSaveInput == 'Q')
         {
-            game.saveGame("Game_Save_Data.txt");
+            game.saveGame("Hamurabi.txt");
             return false;
         }
         return true;
@@ -267,7 +276,7 @@ public:
 
 };
 
-
+//a class that does menu stuff
 class gameMainMenu
 {
 
@@ -279,7 +288,7 @@ public:
 
         do//a dowhile loop so it repeat if needed
         {
-            std::cout << "______------Hamurabi------______\n";
+            std::cout << "\n______------Hamurabi------______\n";
             std::cout << "1.Start New Game\n";
             std::cout << "2.Load Game\n";
             std::cout << "3.How To Play\n";
@@ -328,7 +337,8 @@ public:
                 << "\n\n\nEach person requires 20 bushels to survive throughout the year."
                 << "\nOver-allocating food will bring in immigrants who will be accounted for within the next fiscal year."
                 << "\nEach person that has been fed will be able to harvest up to 10 acres of land for the year. \nEach acre of land require 2 bushels to plant seeds for the year"
-                << "\nFinally, any remaining bushels can be used to purchase more land, if you so wish.";
+                << "\nFinally, any remaining bushels can be used to purchase more land, if you so wish."
+                << std::endl;
         }
 };
 
