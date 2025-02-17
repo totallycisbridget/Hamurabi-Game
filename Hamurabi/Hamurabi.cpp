@@ -12,11 +12,12 @@ struct gameState
     int popCount; //the current population number
     int bushelsCount; //amount of bushels owned
     int year; //current year
+    int totalImmigration; //the total amount of immigrants in the city
 
 
     float numKilledPercentage = 0;
 
-    gameState() : acresCount(1000), popCount(100), bushelsCount(3000), year(1)
+    gameState() : acresCount(1000), popCount(100), bushelsCount(3000), year(1), totalImmigration(0)
     {
         srand(time(0));
     }
@@ -29,7 +30,8 @@ struct gameState
             file << acresCount << "\t"
                 << popCount << "\t"
                 << bushelsCount << "\t"
-                << year; //if it opens these variables will be added
+                << year << "\t"
+                << totalImmigration; //if it opens these variables will be added
             file.close(); //close the file
             std::cout << "save successful" << std::endl;
         }
@@ -47,7 +49,8 @@ struct gameState
             file >> acresCount
                 >> popCount
                 >> bushelsCount
-                >> year; //adds each number into the corresponding variable
+                >> year
+                >> totalImmigration; //adds each number into the corresponding variable
             file.close();
             std::cout << "load successful" << std::endl;
             return true;
@@ -164,7 +167,7 @@ public:
         int populationFed, populationStarved = 0; //how many people are fed and how many are starved
         int extraFoodCount, immigrationCount = 0; //how much extra food was given, how many immigrants there in the current year
 
-        int totalImmigration = 0;//total amount of immigrants in the city
+        
 
         int tempPopCount = 0;
         tempPopCount += game.popCount;
@@ -173,7 +176,7 @@ public:
         int totalFertileAcres = 0, acresPlanted = 0; //the amount of acres able to be planted, amount of acres planted
 
         //user input for saving later on
-        char userSaveInput;
+        int userSaveInput;
 
 
         int randLandPrice = 17 + (rand() % 10); //gets a random number between 0 and 9 and adds it onto 17 to get anything from 17 to 26
@@ -238,7 +241,7 @@ public:
         {
             extraFoodCount = userFoodInp - (game.popCount * foodPerPerson);
             immigrationCount = extraFoodCount / foodPerPerson;
-            totalImmigration += immigrationCount; //keep track of total immigration numbers
+            game.totalImmigration += immigrationCount; //keep track of total immigration numbers
             game.popCount += immigrationCount;
             std::cout << immigrationCount
                 << " immigrants have joined our beloved city"
@@ -258,7 +261,7 @@ public:
          
 
         //std::cout << "Bushels before land purchase: " << game.bushelsCount << "\n";
-        game.bushelsCount -= (userLandPurchInp * randLandPrice);
+        //game.bushelsCount -= (userLandPurchInp * randLandPrice);
         //std::cout << "land: " << userLandPurchInp * randLandPrice << " After purchase: " << game.bushelsCount << "\n";
 
         
@@ -276,7 +279,7 @@ public:
             << acresPlanted << " acres of land were planted.\n"
             << totalHarvest << " bushels were harvested.\n"
             << immigrationCount << " immigrants moved into the city.\n"
-            << totalImmigration << " total immigrants have joined the city so far\n"
+            << game.totalImmigration << " total immigrants have joined the city so far\n"
             << std::endl;
 
 
@@ -286,29 +289,38 @@ public:
 
         game.year++; //actualy increase the round by 1
 
+        do
+        {
+            //give the user the option to save
+            std::cout << "\nWould you like to save?"
+                << "\n1. Yes \n2. No \n3. Save and quit \n4. Quit without saving"
+                << std::endl;
+            std::cin >> userSaveInput;
+            game.checkInput(userSaveInput);
 
-        //give the user the option to save
-        std::cout << "\nWould you like to save? \n(y/n/q/d yes, no or save and quit, do not save and quit): ";
-        std::cin >> userSaveInput;
-
-        if (userSaveInput == 'y' || userSaveInput == 'Y')
-        {
-            game.saveGame("Hamurabi.txt");
-            return true;
-        }
-        else if (userSaveInput == 'q' || userSaveInput == 'Q')
-        {
-            game.saveGame("Hamurabi.txt");
-            return false;
-        }
-        else if (userSaveInput == 'd' || userSaveInput == 'D')
-        {
-            return false;
-        }
-        else
-        {
-            std::cout << "Continuing game" << std::endl;
-        }
+            if (userSaveInput == 1)
+            {
+                game.saveGame("Hamurabi.txt");
+                return true;
+            }
+            else if (userSaveInput == 2)
+            {
+                return true;
+            }
+            else if (userSaveInput == 3)
+            {
+                game.saveGame("Hamurabi.txt");
+                return false;
+            }
+            else if (userSaveInput == 4)
+            {
+                return false;
+            }
+            /*else
+            {
+                std::cout << "Continuing game" << std::endl;
+            }*/
+        } while (true);
         return true;
     }
 
