@@ -14,6 +14,8 @@ struct gameState
     int year; //current year
 
 
+    float numKilledPercentage = 0;
+
     gameState() : acresCount(1000), popCount(100), bushelsCount(3000), year(1)
     {
         srand(time(0));
@@ -58,8 +60,13 @@ struct gameState
     }
 
     //make sure the user hasnt gone past the goal
-    bool checkGameStatus()
+    bool checkGameStatus(int numKilled, int tempPopCount)
     {
+        
+        numKilledPercentage = (static_cast<float>(numKilled) / tempPopCount) * 100; //converts the variables into floats 
+         //the amount of people killed in the year divided by the amount of living people, * 100 to get the percentage of deaths
+        std::cout << numKilledPercentage << " " << tempPopCount << " " << numKilled << std::endl;;
+
         //check for alive citizens
         if (popCount <= 0)
         {
@@ -68,6 +75,8 @@ struct gameState
             return false;
 
         }
+
+
         if (year >= 10)
         {
             std::cout << "Congratulations Dear Leader. \nYou have successfully completely your 10 year term"
@@ -76,6 +85,27 @@ struct gameState
             return true;
         }
 
+        if (numKilledPercentage >= 50)
+        {
+            std::cout << "At a staggering "
+                << numKilledPercentage << "%, you have let a total of "
+                << numKilled << " of our citizens die!\nYou shall pay for your poor leadership with your life."
+                << "\nYou are beheaded in front of the remains of your people.\nStart again."
+                << std::endl;
+            return false;
+        }
+        else if (numKilledPercentage == 0)
+        {
+            std::cout << "No one died this year.\nHow wonderfull."
+                << std::endl;
+        }
+        else
+        {
+            std::cout << numKilled << " starved to death.\nThat's "
+                << numKilledPercentage << "% of our population, now dead."
+                << std::endl;
+        }
+        
         return false;
 
 
@@ -84,22 +114,13 @@ struct gameState
 
     bool checkInput(int varCheck)
     {
-        if (std::cin.fail()) //input validation
+        if (std::cin.fail() || varCheck < 0) //input validation
         {
             std::cout << "Try Again."
                 << std::endl;; //actually tell the user what happened
             std::cin.clear();//clears the inputso it can be redone by the user
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');//clears the buffer
             return true;//ensure the users has to redo their input
-        }
-
-        if (varCheck < 0) //while this is not very efficient and i could probably put these into a function, i cant be bothered. ill do it later
-        {
-            std::cout << "Try Again."
-                << std::endl;; //actually tell the user what happened
-            std::cin.clear();//clears the inputso it can be redone by the user
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            return true;
         }
         
         return false;//returns false if inputs are valid
@@ -140,10 +161,16 @@ public:
         const int plantingCost = 2; //each acre can only be planted with 2 bushels
 
         //general variables ill need
-        int populationFed, populationStarved = 0;
-        int extraFoodCount, immigrationCount = 0;
-        int harvestPerAcre, totalHarvest = 0; //variables for harvesting
-        int totalFertileAcres = 0, acresPlanted = 0;
+        int populationFed, populationStarved = 0; //how many people are fed and how many are starved
+        int extraFoodCount, immigrationCount = 0; //how much extra food was given, how many immigrants there in the current year
+
+        int totalImmigration = 0;//total amount of immigrants in the city
+
+        int tempPopCount = 0;
+        tempPopCount += game.popCount;
+
+        int harvestPerAcre, totalHarvest = 0; //how many bushels each acre can produce, the total harvest for the year
+        int totalFertileAcres = 0, acresPlanted = 0; //the amount of acres able to be planted, amount of acres planted
 
         //user input for saving later on
         char userSaveInput;
@@ -206,15 +233,12 @@ public:
             populationStarved = game.popCount - populationFed;
             game.popCount = populationFed;
 
-            std::cout << "You have starved "
-                << populationStarved
-                << " of the population."
-                << std::endl; //teling the player how many theyve killed
         }
         else if (populationFed > game.popCount) //if there is more food given than needed, the number of immigrants will be workd out
         {
             extraFoodCount = userFoodInp - (game.popCount * foodPerPerson);
             immigrationCount = extraFoodCount / foodPerPerson;
+            totalImmigration += immigrationCount; //keep track of total immigration numbers
             game.popCount += immigrationCount;
             std::cout << immigrationCount
                 << " immigrants have joined our beloved city"
@@ -233,31 +257,39 @@ public:
         if ((acresPlanted = userPlantingInp * plantingCost) > game.acresCount) acresPlanted = game.acresCount; //ensure that user cannot plant more than owned
          
 
-        game.bushelsCount -= (acresPlanted * plantingCost);
+        //std::cout << "Bushels before land purchase: " << game.bushelsCount << "\n";
+        game.bushelsCount -= (userLandPurchInp * randLandPrice);
+        //std::cout << "land: " << userLandPurchInp * randLandPrice << " After purchase: " << game.bushelsCount << "\n";
+
         
 
         harvestPerAcre = 2 + (rand() % 5); //random number from 2 - 6
         totalHarvest = acresPlanted * harvestPerAcre;
-        game.bushelsCount += totalHarvest; //figure out how many bushels user gets from acres
+        //std::cout << "Bushels before harvest: " << game.bushelsCount << "\n";
+        game.bushelsCount += totalHarvest;
+        //std::cout << "Harvested: " << totalHarvest << " After harvest: " << game.bushelsCount << "\n";
+        //figure out how many bushels user gets from acres
 
 
         //years summary
         std::cout << "\n"
-            << populationStarved << " starved to death.\n"
             << acresPlanted << " acres of land were planted.\n"
-            << totalHarvest << " bushels were harvested\n"
+            << totalHarvest << " bushels were harvested.\n"
+            << immigrationCount << " immigrants moved into the city.\n"
+            << totalImmigration << " total immigrants have joined the city so far\n"
             << std::endl;
 
-        game.year++;
 
 
-        if (game.checkGameStatus()) return false;//stop the game is the game has reached 10 years
+        if (game.checkGameStatus(populationStarved, tempPopCount)) return false;//stop the game is the game has reached 10 years
         
+
+        game.year++; //actualy increase the round by 1
+
 
         //give the user the option to save
-        std::cout << "\nWould you like to save? (y/n/q yes, no or quit): ";
+        std::cout << "\nWould you like to save? \n(y/n/q/d yes, no or save and quit, do not save and quit): ";
         std::cin >> userSaveInput;
-        
 
         if (userSaveInput == 'y' || userSaveInput == 'Y')
         {
@@ -268,6 +300,14 @@ public:
         {
             game.saveGame("Hamurabi.txt");
             return false;
+        }
+        else if (userSaveInput == 'd' || userSaveInput == 'D')
+        {
+            return false;
+        }
+        else
+        {
+            std::cout << "Continuing game" << std::endl;
         }
         return true;
     }
@@ -285,6 +325,7 @@ public:
     {
         int menuUserChoice;
         mainGame game;
+        gameState checks;
 
         do//a dowhile loop so it repeat if needed
         {
@@ -294,14 +335,7 @@ public:
             std::cout << "3.How To Play\n";
             std::cout << "4.Exit\n";
             std::cin >> menuUserChoice;
-            if (std::cin.fail()) //input validation
-            {
-                std::cout << "Enter a whole number according to the menu choice"
-                    << std::endl;; //actually tell the user what happened
-                std::cin.clear();//clears the inputso it can be redone by the user
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                continue;//get the user input again
-            }
+            if (checks.checkInput(menuUserChoice)) continue;
 
 
             
@@ -323,7 +357,8 @@ public:
                     << std::endl;
                 exit(0);
             default:
-                std::cout << "Invalid. \nPick again.";
+                std::cout << "Invalid. \nPick again."
+                    << std::endl;
 
             }
         } while (true);
@@ -345,7 +380,11 @@ public:
 int main()
 {
     gameMainMenu menu;
-    menu.mainMenu();
+    while (true)
+    {
+        menu.mainMenu(); //player goes back to menu when they press quit midgame
+    }
+    
 
     return 0;
 }
