@@ -75,7 +75,7 @@ struct gameState
         {
             std::cout << "Everyone has starved to death." 
                 << std::endl;
-            return false;
+            return true;
 
         }
 
@@ -95,11 +95,11 @@ struct gameState
                 << numKilled << " of our citizens die!\nYou shall pay for your poor leadership with your life."
                 << "\nYou are beheaded in front of the remains of your people.\nStart again."
                 << std::endl;
-            return false;
+            return true;
         }
         else if (numKilledPercentage == 0)
         {
-            std::cout << "No one died this year.\nHow wonderfull."
+            std::cout << "No one died this year.\nHow wonderful."
                 << std::endl;
         }
         else

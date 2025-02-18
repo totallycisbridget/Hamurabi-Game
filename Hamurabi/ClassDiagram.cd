@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="mainGame">
+    <Position X="12" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAIAAACAAAAAAA=</HashCode>
+      <FileName>Hamurabi.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="gameMainMenu">
+    <Position X="10.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Hamurabi.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="gameState">
+    <Position X="8.25" Y="1.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>QCAEAQAAAAAAAAAAEAAAgAAAAAAAAAAAAgApAAAAIAA=</HashCode>
+      <FileName>Hamurabi.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
