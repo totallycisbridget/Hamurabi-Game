@@ -68,7 +68,7 @@ struct gameState
         
         numKilledPercentage = (static_cast<float>(numKilled) / tempPopCount) * 100; //converts the variables into floats 
          //the amount of people killed in the year divided by the amount of living people, * 100 to get the percentage of deaths
-        std::cout << numKilledPercentage << " " << tempPopCount << " " << numKilled << std::endl;;
+        //std::cout << numKilledPercentage << " " << tempPopCount << " " << numKilled << std::endl;;
 
         //check for alive citizens
         if (popCount <= 0)
@@ -138,6 +138,9 @@ class mainGame
 private:
     gameState game;
 
+    //some constants
+    const int foodPerPerson = 20; //each person will always require 20 bushels
+    const int plantingCost = 2; //each acre can only be planted with 2 bushels
 
 public:
 
@@ -157,28 +160,19 @@ public:
 
 
     bool gameYear(){
-        int userFoodInp, userPlantingInp, userLandPurchInp; //variables for user inputs
+        int userFoodInp, userPlantingInp, userLandPurchInp, userSaveInput = 0; //variables for user inputs
 
-        //some constants
-        const int foodPerPerson = 20; //each person will always require 20 bushels
-        const int plantingCost = 2; //each acre can only be planted with 2 bushels
+        
 
         //general variables ill need
         int populationFed, populationStarved = 0; //how many people are fed and how many are starved
         int extraFoodCount, immigrationCount = 0; //how much extra food was given, how many immigrants there in the current year
 
-        
-
         int tempPopCount = 0;
         tempPopCount += game.popCount;
 
         int harvestPerAcre, totalHarvest = 0; //how many bushels each acre can produce, the total harvest for the year
-        int totalFertileAcres = 0, acresPlanted = 0; //the amount of acres able to be planted, amount of acres planted
-
-        //user input for saving later on
-        int userSaveInput;
-
-
+        int totalFertileAcres = 0, acresPlanted = 0; //the amount of acres able to be planted, amount of acres 
         int randLandPrice = 17 + (rand() % 10); //gets a random number between 0 and 9 and adds it onto 17 to get anything from 17 to 26
 
 
@@ -254,7 +248,7 @@ public:
         for (int i = 0; i < game.popCount; i++) //basically goes tyhrough each of the population and works out how much they harvest
         {
             totalFertileAcres += 5 + (rand() % 6); //random number from 5 - 10
-        }
+        } //each person can farm 5-10 acres of land as long as they fed.
 
         //acresPlanted = userPlantingInp * plantingCost; //each acre requires 2 bushels to be planted
         if ((acresPlanted = userPlantingInp * plantingCost) > game.acresCount) acresPlanted = game.acresCount; //ensure that user cannot plant more than owned
@@ -298,28 +292,26 @@ public:
             std::cin >> userSaveInput;
             game.checkInput(userSaveInput);
 
-            if (userSaveInput == 1)
+            
+            switch (userSaveInput)
             {
+            case 1:
                 game.saveGame("Hamurabi.txt");
                 return true;
-            }
-            else if (userSaveInput == 2)
-            {
+            
+            case 2:
+            
                 return true;
-            }
-            else if (userSaveInput == 3)
-            {
+           
+            case 3:
+            
                 game.saveGame("Hamurabi.txt");
                 return false;
-            }
-            else if (userSaveInput == 4)
-            {
+           
+            case 4:
+            
                 return false;
             }
-            /*else
-            {
-                std::cout << "Continuing game" << std::endl;
-            }*/
         } while (true);
         return true;
     }
